@@ -13,9 +13,11 @@ import (
 	"time"
 
 	bakstorage "github.com/fr12k/cloudsql-exporter/pkg/storage"
+	"github.com/googleapis/gax-go/v2/apierror"
 
 	"google.golang.org/api/googleapi"
 	"google.golang.org/api/sqladmin/v1"
+	"google.golang.org/grpc/codes"
 	"gopkg.in/yaml.v3"
 
 	"cloud.google.com/go/iam"
@@ -406,7 +408,8 @@ func (c *CloudSQL) savePassword(password string, dbInstance string) error {
 		Name: fmt.Sprintf("projects/%s/secrets/%s", c.ProjectID, strings.ToUpper(dbInstance)),
 	})
 
-	if err != nil /*&& err.(*apierror.APIError).Code != 404 */ {
+	if err != nil && err.(*apierror.APIError).GRPCStatus().Code() != codes.NotFound {
+		fmt.Printf("Failed to get secret: %v+\n", err)
 		slog.Error("Failed to get secret", "instance", dbInstance, "error", err)
 	}
 
@@ -465,7 +468,14 @@ func (c *CloudSQL) savePassword(password string, dbInstance string) error {
 	return nil
 }
 
-func (c *CloudSQL) Restore(opts *RestoreOptions) (*string, error) {
+type RestoreResult struct {
+	Instance string
+	Secret   string
+}
+
+// TODO return GCOP secret name containing the CloudSQL password for manual checkup
+// TODO provide link to GCP CloudSQL overview page as well
+func (c *CloudSQL) Restore(opts *RestoreOptions) (*RestoreResult, error) {
 	//TODO remove the hard prefix of db instance with name restore-* this is to prevent any conflict with real database instances
 	// Define the database instance parameters
 	password := generatePassword(12)
@@ -561,7 +571,7 @@ func (c *CloudSQL) Restore(opts *RestoreOptions) (*string, error) {
 		slog.Info("Successfully created PostgreSQL instance database", "instance", dbinstance.Name, "database", database.Name)
 	} else {
 		slog.Warn("Database already exists and to prevent any data loss restore stops here", "instance", dbinstance.Name, "database", database.Name)
-		return &dbinstance.Name, fmt.Errorf("database already exists")
+		return nil, fmt.Errorf("database already exists")
 	}
 
 	reader, err := c.storageSvc.Bucket(backupLocation.Bucket).Object(backupLocation.UserLocation()).NewReader(c.ctx)
@@ -589,18 +599,27 @@ func (c *CloudSQL) Restore(opts *RestoreOptions) (*string, error) {
 		u, err := c.sqlAdminSvc.Users.Get(c.ProjectID, dbinstance.Name, sqlUser.Name).Context(c.ctx).Do()
 		if err != nil && err.(*googleapi.Error).Code != 404 {
 			slog.Error("Failed to get user", "user", user, "error", err)
-			return nil, err
+			return &RestoreResult{
+				Instance: dbinstance.Name,
+				Secret:   strings.ToUpper(dbinstance.Name),
+			}, err
 		}
 		if u == nil {
 			operation, err := c.sqlAdminSvc.Users.Insert(c.ProjectID, dbinstance.Name, sqlUser).Context(c.ctx).Do()
 			if err != nil {
 				slog.Error("Failed to create PostgreSQL user", "instance", dbinstance.Name, "database", database.Name, "user", sqlUser.Name, "error", err)
-				return nil, err
+				return &RestoreResult{
+					Instance: dbinstance.Name,
+					Secret:   strings.ToUpper(dbinstance.Name),
+				}, err
 			}
 			// Wait for the operation to complete
 			if err := c.WaitForSQLOperation(time.Second*10, operation); err != nil {
 				slog.Error("Failed to create PostgreSQL user", "instance", dbinstance.Name, "database", database.Name, "user", sqlUser.Name, "error", err)
-				return nil, err
+				return &RestoreResult{
+					Instance: dbinstance.Name,
+					Secret:   strings.ToUpper(dbinstance.Name),
+				}, err
 			}
 			slog.Info("Successfully created PostgreSQL user", "instance", dbinstance.Name, "database", database.Name, "user", sqlUser.Name)
 		}
@@ -653,13 +672,19 @@ func (c *CloudSQL) Restore(opts *RestoreOptions) (*string, error) {
 	importOp, err := c.sqlAdminSvc.Instances.Import(c.ProjectID, fmt.Sprintf("restore-%s", opts.Instance), importReq).Context(c.ctx).Do()
 	if err != nil {
 		slog.Error("Failed to import data", "file", opts.File, "error", err)
-		return nil, err
+		return &RestoreResult{
+			Instance: dbinstance.Name,
+			Secret:   strings.ToUpper(dbinstance.Name),
+		}, err
 	}
 
 	// Wait for the import operation to complete
 	if err := c.WaitForSQLOperation(time.Minute*1, importOp); err != nil {
 		slog.Error("Failed to import data", "error", err)
-		return nil, err
+		return &RestoreResult{
+			Instance: dbinstance.Name,
+			Secret:   strings.ToUpper(dbinstance.Name),
+		}, err
 	}
 
 	slog.Info("Data imported successfully", "instance", dbinstance.Name, "file", opts.File)
@@ -676,7 +701,10 @@ func (c *CloudSQL) Restore(opts *RestoreOptions) (*string, error) {
 	_, err = object.Attrs(c.ctx)
 	if err != nil && err != storage.ErrObjectNotExist {
 		slog.Error("Failed to retrieve bucket object", "location", backupLocation.StatsLocation(database.Name), "error", err)
-		return nil, err
+		return &RestoreResult{
+			Instance: dbinstance.Name,
+			Secret:   strings.ToUpper(dbinstance.Name),
+		}, err
 	}
 
 	//Only check restore integrity when stats yaml file exists. If not, skip the check
@@ -685,21 +713,30 @@ func (c *CloudSQL) Restore(opts *RestoreOptions) (*string, error) {
 		reader, err = object.NewReader(c.ctx)
 		if err != nil {
 			slog.Error("Failed to read user file", "location", backupLocation.StatsLocation(database.Name), "error", err)
-			return nil, err
+			return &RestoreResult{
+				Instance: dbinstance.Name,
+				Secret:   strings.ToUpper(dbinstance.Name),
+			}, err
 		}
 		defer reader.Close()
 
 		err = yaml.NewDecoder(reader).Decode(&statsBackup)
 		if err != nil {
 			slog.Error("Failed to decode stats", "error", err)
-			return nil, err
+			return &RestoreResult{
+				Instance: dbinstance.Name,
+				Secret:   strings.ToUpper(dbinstance.Name),
+			}, err
 		}
 
 		var validationErrors []error
 		for key, value := range stats {
 			if _, ok := statsBackup[key]; !ok {
 				slog.Error("Stats not found", "key", key)
-				return nil, errors.New("stats not found")
+				return &RestoreResult{
+					Instance: dbinstance.Name,
+					Secret:   strings.ToUpper(dbinstance.Name),
+				}, errors.New("stats not found")
 			}
 			if value.RowCount != statsBackup[key].RowCount {
 				slog.Error("Row count mismatch", "key", key, "value", value.RowCount, "backup", statsBackup[key].RowCount)
@@ -707,7 +744,10 @@ func (c *CloudSQL) Restore(opts *RestoreOptions) (*string, error) {
 			}
 		}
 		if validationErrors != nil {
-			return nil, errors.Join(validationErrors...)
+			return &RestoreResult{
+				Instance: dbinstance.Name,
+				Secret:   strings.ToUpper(dbinstance.Name),
+			}, errors.Join(validationErrors...)
 		}
 		slog.Info("Restore integrity check passed", "stats", stats)
 
@@ -728,5 +768,8 @@ func (c *CloudSQL) Restore(opts *RestoreOptions) (*string, error) {
 		slog.Info("Stats file not found, skipping integrity check", "location", backupLocation.StatsLocation(database.Name))
 	}
 
-	return &dbinstance.Name, nil
+	return &RestoreResult{
+		Instance: dbinstance.Name,
+		Secret:   strings.ToUpper(dbinstance.Name),
+	}, nil
 }
