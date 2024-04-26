@@ -1,6 +1,9 @@
 package cmd
 
 import (
+	"log/slog"
+
+	"github.com/dusted-go/logging/prettylog"
 	"github.com/fr12k/cloudsql-exporter/pkg/version"
 	"github.com/spf13/cobra"
 )
@@ -11,8 +14,9 @@ var RootCmd = &cobra.Command{
 	Short: "This is tool to export/import data from/to Cloud SQL instances.",
 	Long:  `This is tool to export/import data from/to Cloud SQL instances.`,
 
-	SilenceUsage:  true,
-	SilenceErrors: true,
+	PersistentPreRun: setupLogging,
+	SilenceUsage:     true,
+	SilenceErrors:    true,
 }
 
 func init() {
@@ -20,24 +24,24 @@ func init() {
 	AddRequiredPersistentFlagShort(RootCmd, "project", "p", "The GCP project name that contains the Cloud SQL instance.")
 	AddRequiredPersistentFlagShort(RootCmd, "instance", "i", "The GCP Cloud SQL instance name to export/import data from.")
 	RootCmd.PersistentFlags().String("user", "", "The Cloud SQL user to connect to the database.")
+	RootCmd.PersistentFlags().Bool("debug", false, "Enable debug logging including source code lines as well. (default false)")
 
 	RootCmd.Version = version.BuildVersion
 }
 
-func AddRequiredPersistentFlagShort(ccmd *cobra.Command, name, shorthand, usage string) {
-	ccmd.PersistentFlags().StringP(name, shorthand, "", usage)
-	err := ccmd.MarkPersistentFlagRequired(name)
-	if err != nil {
-		panic(err)
+func setupLogging(ccmd *cobra.Command, _ []string) {
+	logOpts := slog.HandlerOptions{
+		Level:       slog.LevelInfo,
+		AddSource:   false,
+		ReplaceAttr: nil,
 	}
-}
-
-func AddRequiredFlag(ccmd *cobra.Command, ref *string, name, usage string) {
-	ccmd.Flags().StringVar(ref, name, "", usage)
-	err := ccmd.MarkFlagRequired(name)
-	if err != nil {
-		panic(err)
+	if GetBool(ccmd, "debug") {
+		logOpts.Level = slog.LevelDebug
+		logOpts.AddSource = true
 	}
+	prettyHandler := prettylog.NewHandler(&logOpts)
+	logger := slog.New(prettyHandler)
+	slog.SetDefault(logger)
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.

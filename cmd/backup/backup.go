@@ -41,10 +41,10 @@ func init() {
 }
 
 func execute(ccmd *cobra.Command, args []string) error {
-	bucket := GetString(ccmd, "bucket")
-	project := GetString(ccmd, "project")
-	instance := GetString(ccmd, "instance")
-	user := GetString(ccmd, "user")
+	bucket := cmd.GetString(ccmd, "bucket")
+	project := cmd.GetString(ccmd, "project")
+	instance := cmd.GetString(ccmd, "instance")
+	user := cmd.GetString(ccmd, "user")
 
 	opts := backup.BackupOptions{
 		Bucket:   bucket,
@@ -67,12 +67,4 @@ func execute(ccmd *cobra.Command, args []string) error {
 
 	fmt.Printf("Backup locations %v", locations)
 	return nil
-}
-
-func GetString(ccmd *cobra.Command, name string) string {
-	bucket, err := ccmd.Flags().GetString(name)
-	if err != nil {
-		panic(err)
-	}
-	return bucket
 }
