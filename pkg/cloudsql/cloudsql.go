@@ -56,7 +56,7 @@ func NewCloudSQL(ctx context.Context, sqlAdminSvc *sqladmin.Service, storageSvc 
 
 // EnumerateCloudSQLDatabaseInstances enumerates Cloud SQL database instances in the given project.
 func (c *CloudSQL) EnumerateCloudSQLDatabaseInstances(instanceID string) (Instances, error) {
-	slog.Info("Enumerating Cloud SQL instances in project", "projectId", c.ProjectID)
+	slog.Debug("Enumerating Cloud SQL instances in project", "projectId", c.ProjectID)
 
 	instances := Instances{}
 
@@ -98,7 +98,7 @@ func (c *CloudSQL) GetSvcAcctForCloudSQLInstance(instanceID, database string) (s
 
 // AddRoleBindingToGCSBucket adds a role binding to a GCS bucket.
 func (c *CloudSQL) AddRoleBindingToGCSBucket(bucketName, role, sqlAdminSvcAccount, instance string) error {
-	slog.Info("Ensuring role to bucket for service account used by instance", "role", role, "bucket", bucketName, "service_account", sqlAdminSvcAccount, "instance", instance)
+	slog.Debug("Ensuring role to bucket for service account used by instance", "role", role, "bucket", bucketName, "service_account", sqlAdminSvcAccount, "instance", instance)
 
 	svcAcctMember := fmt.Sprintf("serviceAccount:%s", sqlAdminSvcAccount)
 
@@ -125,7 +125,7 @@ func (c *CloudSQL) AddRoleBindingToGCSBucket(bucketName, role, sqlAdminSvcAccoun
 
 // RemoveRoleBindingToGCSBucket remove a role binding to a GCS bucket.
 func (c *CloudSQL) RemoveRoleBindingToGCSBucket(bucketName, role, sqlAdminSvcAccount, instance string) error {
-	slog.Info("Deleting role to bucket for service account used by instance", "role", role, "bucket", bucketName, "service_account", sqlAdminSvcAccount, "instance", instance)
+	slog.Debug("Deleting role to bucket for service account used by instance", "role", role, "bucket", bucketName, "service_account", sqlAdminSvcAccount, "instance", instance)
 
 	svcAcctMember := fmt.Sprintf("serviceAccount:%s", sqlAdminSvcAccount)
 
@@ -161,10 +161,10 @@ func (c *CloudSQL) ListDatabasesForCloudSQLInstance(instanceID string) (Database
 
 	for _, database := range list.Items {
 		if database.Name == "mysql" || database.Name == "postgres" {
-			slog.Info("Skipping database", "database", database.Name)
+			slog.Debug("Skipping database", "database", database.Name)
 			continue
 		}
-		slog.Info("Found database for instance", "database", database.Name, "instance", instanceID)
+		slog.Debug("Found database for instance", "database", database.Name, "instance", instanceID)
 		databases = append(databases, database.Name)
 	}
 
@@ -181,7 +181,7 @@ func (c *CloudSQL) ExportUsers(instanceID string) ([]*sqladmin.User, error) {
 
 // ExportCloudSQLUser exports a Cloud SQL users to Google Cloud Storage bucket.
 func (c *CloudSQL) ExportCloudSQLUser(backupLocation bakstorage.Location) ([]string, error) {
-	slog.Info("Exporting users for instance", "instance", backupLocation.Instance, "location", backupLocation.UserLocation())
+	slog.Debug("Exporting users for instance", "instance", backupLocation.Instance, "location", backupLocation.UserLocation())
 
 	users, err := c.ExportUsers(backupLocation.Instance)
 	if err != nil {
@@ -195,7 +195,7 @@ func (c *CloudSQL) ExportCloudSQLUser(backupLocation bakstorage.Location) ([]str
 	userNames := []string{}
 	for _, user := range users {
 		if user.Name == "mysql" || user.Name == "postgres" {
-			slog.Info("Skipping user", "users", user.Name)
+			slog.Debug("Skipping user", "users", user.Name)
 			continue
 		}
 		userNames = append(userNames, user.Name)
@@ -248,7 +248,7 @@ ORDER BY
 	schemaname,
 	tablename;`
 
-	slog.Info("Executing analyze query", "instance", instanceID, "database", conn.Database, "query", "ANALYZE VERBOSE;")
+	slog.Debug("Executing analyze query", "instance", instanceID, "database", conn.Database, "query", "ANALYZE VERBOSE;")
 	_, err = dbConn.Exec("ANALYZE VERBOSE;")
 
 	if err != nil {
@@ -293,7 +293,7 @@ func (c *CloudSQL) ExportCloudSQLStatistics(backupLocation bakstorage.Location, 
 			return nil, err
 		}
 
-		slog.Info("Exporting statistics for instance", "instance", backupLocation.Instance, "location", backupLocation.StatsLocation(database))
+		slog.Debug("Exporting statistics for instance", "instance", backupLocation.Instance, "location", backupLocation.StatsLocation(database))
 
 		bucket := c.storageSvc.Bucket(backupLocation.Bucket)
 		writer := bucket.Object(backupLocation.StatsLocation(database)).NewWriter(c.ctx)
@@ -316,7 +316,7 @@ func (c *CloudSQL) ExportCloudSQLDatabase(backupLocation bakstorage.Location, da
 		location := backupLocation.DatabaseLocation(database)
 
 		locations = append(locations, location)
-		slog.Info("Exporting database for instance", "database", database, "instance", backupLocation.Instance, "location", location)
+		slog.Debug("Exporting database for instance", "database", database, "instance", backupLocation.Instance, "location", location)
 
 		req := &sqladmin.InstancesExportRequest{
 			ExportContext: &sqladmin.ExportContext{

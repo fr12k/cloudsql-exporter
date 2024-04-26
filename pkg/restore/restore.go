@@ -10,8 +10,7 @@ import (
 	"google.golang.org/api/sqladmin/v1"
 )
 
-func Restore(opts *cloudsql.RestoreOptions) ([]string, error) {
-	var backupPaths []string
+func Restore(opts *cloudsql.RestoreOptions) (*cloudsql.RestoreResult, error) {
 
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
@@ -36,13 +35,13 @@ func Restore(opts *cloudsql.RestoreOptions) ([]string, error) {
 
 	cls := cloudsql.NewCloudSQL(ctx, sqlAdminSvc, storageSvc, secretSvc, opts.Project)
 
-	password, err := cls.Restore(opts)
+	result, err := cls.Restore(opts)
 	if err != nil {
 		slog.Error("error restore cloudsql database", "instance", opts.Instance, "error", err)
 		return nil, err
 	}
 
-	slog.Info("Restore complete", "instance", *password)
+	slog.Info("Restore complete", "instance", result.Instance)
 
-	return backupPaths, nil
+	return result, nil
 }
