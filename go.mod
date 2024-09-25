@@ -5,7 +5,7 @@ go 1.22
 require (
 	cloud.google.com/go/iam v1.2.0
 	cloud.google.com/go/secretmanager v1.14.0
-	github.com/jackc/pgx/v5 v5.5.5
+	github.com/jackc/pgx/v5 v5.7.1
 	github.com/spf13/cobra v1.8.0
 	github.com/stretchr/testify v1.9.0
 	google.golang.org/api v0.198.0
@@ -26,8 +26,8 @@ require (
 	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect
-	github.com/jackc/pgservicefile v0.0.0-20221227161230-091c0ba34f0a // indirect
-	github.com/jackc/puddle/v2 v2.2.1 // indirect
+	github.com/jackc/pgservicefile v0.0.0-20240606120523-5a60cdf6a761 // indirect
+	github.com/jackc/puddle/v2 v2.2.2 // indirect
 	github.com/opencontainers/go-digest v1.0.0 // indirect
 	github.com/opencontainers/image-spec v1.0.2 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
@@ -43,7 +43,7 @@ require (
 )
 
 require (
-	cloud.google.com/go/cloudsqlconn v1.8.1
+	cloud.google.com/go/cloudsqlconn v1.12.1
 	cloud.google.com/go/compute/metadata v0.5.1 // indirect
 	cloud.google.com/go/storage v1.43.0
 	github.com/buildpeak/sqltestutil v1.0.8
