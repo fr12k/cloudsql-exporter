@@ -2,8 +2,6 @@ module github.com/fr12k/cloudsql-exporter
 
 go 1.22
 
-toolchain go1.22.1
-
 require (
 	cloud.google.com/go/iam v1.1.10
 	cloud.google.com/go/secretmanager v1.13.4
@@ -50,7 +48,7 @@ require (
 	cloud.google.com/go/compute/metadata v0.4.0 // indirect
 	cloud.google.com/go/storage v1.41.0
 	github.com/buildpeak/sqltestutil v1.0.8
-	github.com/dusted-go/logging v1.1.3
+	github.com/dusted-go/logging v1.3.0
 	github.com/felixge/httpsnoop v1.0.4 // indirect
 	github.com/go-logr/logr v1.4.1 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
