@@ -1,7 +1,8 @@
+version: 2
 builds:
   - binary: cloudsql-exporter
     ldflags:
-      - -X 'github.com/trufflesecurity/cloudsql-exporter/pkg/version.BuildVersion={{ .Version }}'
+      - -X 'github.com/fr12k/cloudsql-exporter/pkg/version.BuildVersion={{ .Version }}'
     env: [CGO_ENABLED=0]
     goos:
     - linux
@@ -11,19 +12,19 @@ builds:
     - amd64
     - arm64
 dockers:
-  - image_templates: ["trufflesecurity/{{ .ProjectName }}:{{ .Version }}-amd64"]
+  - image_templates: ["fr123k/{{ .ProjectName }}:{{ .Version }}-amd64"]
     dockerfile: Dockerfile.goreleaser
     use: buildx
     build_flag_templates:
     - --platform=linux/amd64
     - --label=org.opencontainers.image.title={{ .ProjectName }}
     - --label=org.opencontainers.image.description={{ .ProjectName }}
-    - --label=org.opencontainers.image.url=https://github.com/trufflesecurity/{{ .ProjectName }}
-    - --label=org.opencontainers.image.source=https://github.com/trufflesecurity/{{ .ProjectName }}
+    - --label=org.opencontainers.image.url=https://github.com/fr12k/{{ .ProjectName }}
+    - --label=org.opencontainers.image.source=https://github.com/fr12k/{{ .ProjectName }}
     - --label=org.opencontainers.image.version={{ .Version }}
     - --label=org.opencontainers.image.revision={{ .FullCommit }}
     - --label=org.opencontainers.image.licenses=AGPL-3.0
-  - image_templates: ["trufflesecurity/{{ .ProjectName }}:{{ .Version }}-arm64v8"]
+  - image_templates: ["fr123k/{{ .ProjectName }}:{{ .Version }}-arm64v8"]
     goarch: arm64
     dockerfile: Dockerfile.goreleaser
     use: buildx
@@ -31,24 +32,24 @@ dockers:
     - --platform=linux/arm64/v8
     - --label=org.opencontainers.image.title={{ .ProjectName }}
     - --label=org.opencontainers.image.description={{ .ProjectName }}
-    - --label=org.opencontainers.image.url=https://github.com/trufflesecurity/{{ .ProjectName }}
-    - --label=org.opencontainers.image.source=https://github.com/trufflesecurity/{{ .ProjectName }}
+    - --label=org.opencontainers.image.url=https://github.com/fr12k/{{ .ProjectName }}
+    - --label=org.opencontainers.image.source=https://github.com/fr12k/{{ .ProjectName }}
     - --label=org.opencontainers.image.version={{ .Version }}
     - --label=org.opencontainers.image.revision={{ .FullCommit }}
     - --label=org.opencontainers.image.licenses=AGPL-3.0
-  - image_templates: ["ghcr.io/trufflesecurity/{{ .ProjectName }}:{{ .Version }}-amd64"]
+  - image_templates: ["ghcr.io/fr12k/{{ .ProjectName }}:{{ .Version }}-amd64"]
     dockerfile: Dockerfile.goreleaser
     use: buildx
     build_flag_templates:
     - --platform=linux/amd64
     - --label=org.opencontainers.image.title={{ .ProjectName }}
     - --label=org.opencontainers.image.description={{ .ProjectName }}
-    - --label=org.opencontainers.image.url=https://github.com/trufflesecurity/{{ .ProjectName }}
-    - --label=org.opencontainers.image.source=https://github.com/trufflesecurity/{{ .ProjectName }}
+    - --label=org.opencontainers.image.url=https://github.com/fr12k/{{ .ProjectName }}
+    - --label=org.opencontainers.image.source=https://github.com/fr12k/{{ .ProjectName }}
     - --label=org.opencontainers.image.version={{ .Version }}
     - --label=org.opencontainers.image.revision={{ .FullCommit }}
     - --label=org.opencontainers.image.licenses=AGPL-3.0
-  - image_templates: ["ghcr.io/trufflesecurity/{{ .ProjectName }}:{{ .Version }}-arm64v8"]
+  - image_templates: ["ghcr.io/fr12k/{{ .ProjectName }}:{{ .Version }}-arm64v8"]
     goarch: arm64
     dockerfile: Dockerfile.goreleaser
     use: buildx
@@ -56,35 +57,35 @@ dockers:
     - --platform=linux/arm64/v8
     - --label=org.opencontainers.image.title={{ .ProjectName }}
     - --label=org.opencontainers.image.description={{ .ProjectName }}
-    - --label=org.opencontainers.image.url=https://github.com/trufflesecurity/{{ .ProjectName }}
-    - --label=org.opencontainers.image.source=https://github.com/trufflesecurity/{{ .ProjectName }}
+    - --label=org.opencontainers.image.url=https://github.com/fr12k/{{ .ProjectName }}
+    - --label=org.opencontainers.image.source=https://github.com/fr12k/{{ .ProjectName }}
     - --label=org.opencontainers.image.version={{ .Version }}
     - --label=org.opencontainers.image.revision={{ .FullCommit }}
     - --label=org.opencontainers.image.licenses=AGPL-3.0
 docker_manifests:
-  - name_template: trufflesecurity/{{ .ProjectName }}:{{ .Version }}
+  - name_template: fr12k/{{ .ProjectName }}:{{ .Version }}
     image_templates:
-    - trufflesecurity/{{ .ProjectName }}:{{ .Version }}-amd64
-    - trufflesecurity/{{ .ProjectName }}:{{ .Version }}-arm64v8
-  - name_template: trufflesecurity/{{ .ProjectName }}:latest
+    - fr12k/{{ .ProjectName }}:{{ .Version }}-amd64
+    - fr12k/{{ .ProjectName }}:{{ .Version }}-arm64v8
+  - name_template: fr12k/{{ .ProjectName }}:latest
     image_templates:
-    - trufflesecurity/{{ .ProjectName }}:{{ .Version }}-amd64
-    - trufflesecurity/{{ .ProjectName }}:{{ .Version }}-arm64v8
-  - name_template: ghcr.io/trufflesecurity/{{ .ProjectName }}:{{ .Version }}
+    - fr12k/{{ .ProjectName }}:{{ .Version }}-amd64
+    - fr12k/{{ .ProjectName }}:{{ .Version }}-arm64v8
+  - name_template: ghcr.io/fr12k/{{ .ProjectName }}:{{ .Version }}
     image_templates:
-    - ghcr.io/trufflesecurity/{{ .ProjectName }}:{{ .Version }}-amd64
-    - ghcr.io/trufflesecurity/{{ .ProjectName }}:{{ .Version }}-arm64v8
-  - name_template: ghcr.io/trufflesecurity/{{ .ProjectName }}:latest
+    - ghcr.io/fr12k/{{ .ProjectName }}:{{ .Version }}-amd64
+    - ghcr.io/fr12k/{{ .ProjectName }}:{{ .Version }}-arm64v8
+  - name_template: ghcr.io/fr12k/{{ .ProjectName }}:latest
     image_templates:
-    - ghcr.io/trufflesecurity/{{ .ProjectName }}:{{ .Version }}-amd64
-    - ghcr.io/trufflesecurity/{{ .ProjectName }}:{{ .Version }}-arm64v8
-brews:
-  - tap:
-      owner: trufflesecurity
-      name: homebrew-cloudsql-exporter
-      token: "{{ .Env.HOMEBREW_TAP_TOKEN }}"
-    description: "Find credentials all over the place"
-    name: "cloudsql-exporter"
-    homepage: "https://github.com/trufflesecurity/cloudsql-exporter"
-    install: |
-      bin.install "cloudsql-exporter"
+    - ghcr.io/fr12k/{{ .ProjectName }}:{{ .Version }}-amd64
+    - ghcr.io/fr12k/{{ .ProjectName }}:{{ .Version }}-arm64v8
+# brews:
+#   - tap:
+#       owner: fr12k
+#       name: homebrew-cloudsql-exporter
+#       token: "{{ .Env.HOMEBREW_TAP_TOKEN }}"
+#     description: "Find credentials all over the place"
+#     name: "cloudsql-exporter"
+#     homepage: "https://github.com/fr12k/cloudsql-exporter"
+#     install: |
+#       bin.install "cloudsql-exporter"
