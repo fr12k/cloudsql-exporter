@@ -1,7 +1,6 @@
 module github.com/fr12k/cloudsql-exporter
 
-go 1.22
-toolchain go1.23.6
+go 1.24.0
 
 require (
 	cloud.google.com/go/iam v1.4.0
