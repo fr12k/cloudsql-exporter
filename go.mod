@@ -3,7 +3,7 @@ module github.com/fr12k/cloudsql-exporter
 go 1.24.0
 
 require (
-	cloud.google.com/go/iam v1.4.0
+	cloud.google.com/go/iam v1.4.1
 	cloud.google.com/go/secretmanager v1.14.5
 	github.com/jackc/pgx/v5 v5.7.2
 	github.com/spf13/cobra v1.9.1
@@ -14,7 +14,7 @@ require (
 
 require (
 	cel.dev/expr v0.19.1 // indirect
-	cloud.google.com/go v0.118.2 // indirect
+	cloud.google.com/go v0.118.3 // indirect
 	cloud.google.com/go/auth v0.15.0 // indirect
 	cloud.google.com/go/auth/oauth2adapt v0.2.7 // indirect
 	cloud.google.com/go/monitoring v1.23.0 // indirect
@@ -53,7 +53,7 @@ require (
 	golang.org/x/sync v0.11.0 // indirect
 	golang.org/x/time v0.10.0 // indirect
 	google.golang.org/genproto v0.0.0-20250122153221-138b5a5a4fd4 // indirect
-	google.golang.org/genproto/googleapis/api v0.0.0-20250207221924-e9438ea467c6 // indirect
+	google.golang.org/genproto/googleapis/api v0.0.0-20250219182151-9fdb1cabc7b2 // indirect
 )
 
 require (
