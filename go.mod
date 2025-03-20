@@ -8,7 +8,7 @@ require (
 	github.com/jackc/pgx/v5 v5.7.2
 	github.com/spf13/cobra v1.9.1
 	github.com/stretchr/testify v1.10.0
-	google.golang.org/api v0.225.0
+	google.golang.org/api v0.226.0
 	gopkg.in/yaml.v3 v3.0.1
 )
 
