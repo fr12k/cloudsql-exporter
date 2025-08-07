@@ -4,7 +4,7 @@ go 1.24.0
 
 require (
 	cloud.google.com/go/iam v1.5.2
-	cloud.google.com/go/secretmanager v1.14.7
+	cloud.google.com/go/secretmanager v1.15.0
 	github.com/jackc/pgx/v5 v5.7.5
 	github.com/spf13/cobra v1.9.1
 	github.com/stretchr/testify v1.10.0
