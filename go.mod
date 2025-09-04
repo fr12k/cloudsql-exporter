@@ -7,7 +7,7 @@ require (
 	cloud.google.com/go/secretmanager v1.15.0
 	github.com/jackc/pgx/v5 v5.7.5
 	github.com/spf13/cobra v1.10.1
-	github.com/stretchr/testify v1.11.0
+	github.com/stretchr/testify v1.11.1
 	google.golang.org/api v0.248.0
 	gopkg.in/yaml.v3 v3.0.1
 )
