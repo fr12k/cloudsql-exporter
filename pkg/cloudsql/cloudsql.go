@@ -379,14 +379,13 @@ func generatePassword(length int) string {
 	// Create a byte slice to store the password characters
 	password := make([]byte, length)
 
-	// Fill the byte slice with random characters chosen securely
+	// Fill the byte slice with random characters from the charset using crypto/rand
 	for i := range password {
-		nBig, err := rand.Int(rand.Reader, big.NewInt(int64(len(charset))))
+		num, err := rand.Int(rand.Reader, big.NewInt(int64(len(charset))))
 		if err != nil {
-			// If rand.Int fails, we can return partial password or ""
-			return ""
+			panic("failed to generate secure random number: " + err.Error())
 		}
-		password[i] = charset[nBig.Int64()]
+		password[i] = charset[num.Int64()]
 	}
 	return string(password)
 }
