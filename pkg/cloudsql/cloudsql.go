@@ -8,9 +8,8 @@ import (
 	"log/slog"
 	"maps"
 	"math"
-	"math/rand"
-	"math/big"
 	"crypto/rand"
+	"math/big"
 	"strings"
 	"time"
 
@@ -388,7 +387,6 @@ func generatePassword(length int) string {
 		}
 		password[i] = charset[num.Int64()]
 	}
-
 	return string(password)
 }
 
