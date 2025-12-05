@@ -8,7 +8,8 @@ import (
 	"log/slog"
 	"maps"
 	"math"
-	"math/rand"
+	"crypto/rand"
+	"math/big"
 	"strings"
 	"time"
 
@@ -375,17 +376,18 @@ func generatePassword(length int) string {
 	// Define the character set
 	const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()-_=+[]{},.<>?;:"
 
-	// Seed the random number generator
-	rand.New(rand.NewSource(time.Now().UnixNano()))
-
 	// Create a byte slice to store the password characters
 	password := make([]byte, length)
 
-	// Fill the byte slice with random characters from the charset
+	// Fill the byte slice with random characters chosen securely
 	for i := range password {
-		password[i] = charset[rand.Intn(len(charset))]
+		nBig, err := rand.Int(rand.Reader, big.NewInt(int64(len(charset))))
+		if err != nil {
+			// If rand.Int fails, we can return partial password or ""
+			return ""
+		}
+		password[i] = charset[nBig.Int64()]
 	}
-
 	return string(password)
 }
 
