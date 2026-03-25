@@ -5,7 +5,7 @@ go 1.25.7
 require (
 	cloud.google.com/go/iam v1.5.3
 	cloud.google.com/go/secretmanager v1.16.0
-	github.com/jackc/pgx/v5 v5.8.0
+	github.com/jackc/pgx/v5 v5.9.1
 	github.com/spf13/cobra v1.10.2
 	github.com/stretchr/testify v1.11.1
 	google.golang.org/api v0.272.0
