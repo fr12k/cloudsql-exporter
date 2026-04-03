@@ -109,7 +109,7 @@ func (c *CloudSQL) AddRoleBindingToGCSBucket(bucketName, role, sqlAdminSvcAccoun
 		return err
 	}
 
-	var iamRole iam.RoleName = iam.RoleName(role)
+	iamRole := iam.RoleName(role)
 
 	if policy.HasRole(svcAcctMember, iamRole) {
 		return nil
@@ -136,7 +136,7 @@ func (c *CloudSQL) RemoveRoleBindingToGCSBucket(bucketName, role, sqlAdminSvcAcc
 		return err
 	}
 
-	var iamRole iam.RoleName = iam.RoleName(role)
+	iamRole := iam.RoleName(role)
 
 	if !policy.HasRole(svcAcctMember, iamRole) {
 		return nil
@@ -191,7 +191,11 @@ func (c *CloudSQL) ExportCloudSQLUser(backupLocation bakstorage.Location) ([]str
 
 	bucket := c.storageSvc.Bucket(backupLocation.Bucket)
 	writer := bucket.Object(backupLocation.UserLocation()).NewWriter(c.ctx)
-	defer writer.Close()
+	defer func() {
+		if err := writer.Close(); err != nil {
+			slog.Error("Failed to close writer", "error", err)
+		}
+	}()
 
 	userNames := []string{}
 	for _, user := range users {
@@ -200,7 +204,7 @@ func (c *CloudSQL) ExportCloudSQLUser(backupLocation bakstorage.Location) ([]str
 			continue
 		}
 		userNames = append(userNames, user.Name)
-		_, err := writer.Write([]byte(fmt.Sprintf("%s\n", user.Name)))
+		_, err := fmt.Fprintf(writer, "%s\n", user.Name)
 		if err != nil {
 			return nil, err
 		}
@@ -231,7 +235,11 @@ func (c *CloudSQL) GetCloudSQLStatistic(instanceID, user, password, database str
 		return nil, err
 	}
 
-	defer dbConn.Close()
+	defer func() {
+		if err := dbConn.Close(); err != nil {
+			slog.Error("Failed to close database connection", "error", err)
+		}
+	}()
 	statsSQL := `
 	SELECT
 	schemaname || '.' || tablename AS full_table_name,
@@ -298,7 +306,11 @@ func (c *CloudSQL) ExportCloudSQLStatistics(backupLocation bakstorage.Location, 
 
 		bucket := c.storageSvc.Bucket(backupLocation.Bucket)
 		writer := bucket.Object(backupLocation.StatsLocation(database)).NewWriter(c.ctx)
-		defer writer.Close()
+		defer func() {
+			if err := writer.Close(); err != nil {
+				slog.Error("Failed to close writer", "error", err)
+			}
+		}()
 
 		err = yaml.NewEncoder(writer).Encode(dbStats)
 		if err != nil {
@@ -580,7 +592,11 @@ func (c *CloudSQL) Restore(opts *RestoreOptions) (*RestoreResult, error) {
 		slog.Error("Failed to open file", "location", backupLocation.UserLocation(), "error", err)
 		return nil, err
 	}
-	defer reader.Close()
+	defer func() {
+		if err := reader.Close(); err != nil {
+			slog.Error("Failed to close reader", "error", err)
+		}
+	}()
 
 	// Read file contents into a string
 	data, err := io.ReadAll(reader)
@@ -719,7 +735,11 @@ func (c *CloudSQL) Restore(opts *RestoreOptions) (*RestoreResult, error) {
 				Secret:   strings.ToUpper(dbinstance.Name),
 			}, err
 		}
-		defer reader.Close()
+		defer func() {
+			if err := reader.Close(); err != nil {
+				slog.Error("Failed to close reader", "error", err)
+			}
+		}()
 
 		err = yaml.NewDecoder(reader).Decode(&statsBackup)
 		if err != nil {

@@ -15,7 +15,7 @@ import (
 // localPostgresDialer is a dialer that connects to a local postgres instance started as a container
 var localPostgresDialer = func(cfg *pgx.ConnConfig) pgconn.DialFunc {
 	return func(ctx context.Context, network, instance string) (net.Conn, error) {
-		return net.Dial("tcp", fmt.Sprintf("%s:%d", cfg.Host, cfg.Port))
+		return net.Dial("tcp", net.JoinHostPort(cfg.Host, fmt.Sprintf("%d", cfg.Port)))
 	}
 }
 
@@ -50,7 +50,9 @@ func TestNewConnection(t *testing.T) {
 	if err != nil {
 		t.Errorf("Error connecting to database: %v", err)
 	}
-	defer db.Close()
+	defer func() {
+		assert.NoError(t, db.Close())
+	}()
 
 	_, err = db.Query("SELECT tablename from pg_catalog.pg_tables")
 	assert.NoError(t, err)
