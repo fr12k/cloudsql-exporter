@@ -32,7 +32,7 @@ require (
 	github.com/docker/go-units v0.4.0 // indirect
 	github.com/envoyproxy/go-control-plane/envoy v1.36.0 // indirect
 	github.com/envoyproxy/protoc-gen-validate v1.3.0 // indirect
-	github.com/go-jose/go-jose/v4 v4.1.3 // indirect
+	github.com/go-jose/go-jose/v4 v4.1.4 // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect
@@ -61,7 +61,7 @@ require (
 require (
 	cloud.google.com/go/cloudsqlconn v1.20.2
 	cloud.google.com/go/compute/metadata v0.9.0 // indirect
-	cloud.google.com/go/storage v1.61.3
+	cloud.google.com/go/storage v1.62.1
 	github.com/buildpeak/sqltestutil v1.0.8
 	github.com/dusted-go/logging v1.3.0
 	github.com/felixge/httpsnoop v1.0.4 // indirect
