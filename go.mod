@@ -3,7 +3,7 @@ module github.com/fr12k/cloudsql-exporter
 go 1.25.7
 
 require (
-	cloud.google.com/go/iam v1.8.0
+	cloud.google.com/go/iam v1.9.0
 	cloud.google.com/go/secretmanager v1.19.0
 	github.com/jackc/pgx/v5 v5.9.2
 	github.com/spf13/cobra v1.10.2
