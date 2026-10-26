@@ -62,7 +62,7 @@ require (
 require (
 	cloud.google.com/go/cloudsqlconn v1.25.4
 	cloud.google.com/go/compute/metadata v0.10.0 // indirect
-	cloud.google.com/go/storage v1.69.0
+	cloud.google.com/go/storage v1.70.0
 	github.com/buildpeak/sqltestutil v1.0.8
 	github.com/dusted-go/logging v1.3.0
 	github.com/felixge/httpsnoop v1.1.0 // indirect
