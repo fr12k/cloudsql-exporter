@@ -3,7 +3,7 @@ module github.com/fr12k/cloudsql-exporter
 go 1.26.0
 
 require (
-	cloud.google.com/go/iam v1.14.0
+	cloud.google.com/go/iam v1.15.0
 	cloud.google.com/go/secretmanager v1.22.0
 	github.com/jackc/pgx/v5 v5.11.0
 	github.com/spf13/cobra v1.10.2
@@ -62,7 +62,7 @@ require (
 require (
 	cloud.google.com/go/cloudsqlconn v1.25.4
 	cloud.google.com/go/compute/metadata v0.10.0 // indirect
-	cloud.google.com/go/storage v1.69.0
+	cloud.google.com/go/storage v1.70.0
 	github.com/buildpeak/sqltestutil v1.0.8
 	github.com/dusted-go/logging v1.3.0
 	github.com/felixge/httpsnoop v1.1.0 // indirect
